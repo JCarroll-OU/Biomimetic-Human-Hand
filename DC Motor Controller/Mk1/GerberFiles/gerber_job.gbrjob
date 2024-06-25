@@ -1,0 +1,24 @@
+{
+    "Header": {
+        "Comment": "All values are metric (mm)",
+        "CreationDate": "2024-05-20T01:51:43Z",
+        "GenerationSoftware": {
+            "Application": "Fusion Electronics",
+            "Vendor": "Autodesk",
+            "Version": "9.7.0"
+        },
+        "Part": "Single"
+    },
+    "Overall": {
+        "BoardThickness": 1.57,
+        "LayerNumber": 2,
+        "Name": {
+            "ProjectId": "DC Motor Controller v45"
+        },
+        "Owner": "James Carroll <jamescarroll630@gmail.com>",
+        "Size": {
+            "X": 100,
+            "Y": 50
+        }
+    }
+}

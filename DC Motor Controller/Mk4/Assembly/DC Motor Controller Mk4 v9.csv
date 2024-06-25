@@ -1,0 +1,5 @@
+Qty,Value,Device,Package,Parts,Description,AVAILABILITY,CHECK_PRICES,DESCRIPTION,MF,MP,MPN,OC_FARNELL,OC_NEWARK,PACKAGE,POPULARITY,PRICE,SNAPEDA_LINK
+9,,CONN_02JST-PTH-2-KIT,JST-2-PTH-KIT,"OUT_1, OUT_2, OUT_3, OUT_4, OUT_5, OUT_6, OUT_7, OUT_8, POWER","Multi connection point. Often used as Generic Header-pin footprint for 0.1 inch spaced/style header connections",,,,,,,,,,,,
+8,,CONN_03JST-PTH-NS,JST-3-PTH-NS,"POTENT_HEADER_1, POTENT_HEADER_2, POTENT_HEADER_3, POTENT_HEADER_4, POTENT_HEADER_5, POTENT_HEADER_6, POTENT_HEADER_7, POTENT_HEADER_8","Multi connection point. Often used as Generic Header-pin footprint for 0.1 inch spaced/style header connections",,,,,,,,,,,,
+2,ARDUINO_NANO,ARDUINO_NANO,SHIELD_ARDUINO_NANO,"CONTROLLER_1, CONTROLLER_2","Arduino Nano, Through Hole Check availability","Not in stock",https://www.snapeda.com/parts/Arduino%20Nano/Arduino/view-part/?ref=eda," Small"," complete"," and breadboard-friendly board based on the ATmega328 (Arduino Nano 3.x) ",Arduino,"Arduino Nano",,,,"Non-Standard Arduino",
+4,L293D,L293D,DIL16,"DRIVER_1, DRIVER_2, DRIVER_3, DRIVER_4","PUSH-PULL 4 CHANNEL DRIVER",,,,,,L293D,9589619,56P8249,,16,,

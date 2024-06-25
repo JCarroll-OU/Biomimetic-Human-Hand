@@ -1,0 +1,17 @@
+Qty,Value,Device,Package,Parts,Description,CATEGORY,COLOR,DESCRIPTION,MANUFACTURER,MPN,OPERATING_TEMP,OPERATING_TEMPERATURE,PART_STATUS,PITCH,RATING,ROHS_COMPLIANCE,ROHS_COMPLIANT,SERIES,SUB-CATEGORY,SUBCATEGORY,THERMALLOSS,TOLERANCE,TYPE,VALUE,VOLTAGE_RATING
+4,"0.1 Ohms",R_CHIP-0603(1608-METRIC),RESC1608X60,"R4, R5, R6, R9","Resistor Fixed - Generic",Resistor,,,,,,,,,,,,,Fixed,,,,,,
+6,0.1uF,C_CHIP-1206(3216-METRIC),CAPC3216X135,"C3, C5, C6, C8, C9, C10","Capacitor - Generic",Capacitor,,,,,,,,,,,,,,,,,,,
+2,"10 kOhm",R_CHIP-0603(1608-METRIC),RESC1608X60,"R3, R7","Resistor Fixed - Generic",Resistor,,,,,,,,,,,,,Fixed,,,,,,
+1,100uF,C_CHIP-1206(3216-METRIC),CAPC3216X135,C1,"Capacitor - Generic",Capacitor,,,,,,,,,,,,,,,,,,,
+2,10uF,C-POL_TANTALUM-1206(3216-METRIC),CAPMP3216X180N,"C4, C7","Capacitor Polarised - Generic",Capacitor,,,,,,,,,,,,,,,,,,,
+1,10uF,C_CHIP-1206(3216-METRIC),CAPC3216X135,C2,"Capacitor - Generic",Capacitor,,,,,,,,,,,,,,,,,,,
+3,"220 Ohm",R_CHIP-0603(1608-METRIC),RESC1608X60,"R1, R2, R8","Resistor Fixed - Generic",Resistor,,,,,,,,,,,,,Fixed,,,,,,
+2,ATMEGA328P,ATMEGA328P_VQFN,QFN50P500X500X90-33T310N,"MCU_1, MCU_2","8-bit AVR Microcontroller with 32K Bytes In-System Programmable Flash",IC_Embedded,,,Microchip,ATmega328P-AU,"-40 to 85 °C",,Active,,,,,,Microcontroller,,,,,ATMEGA328P,
+4,INA180_PINOUTA,INA180_PINOUTA,SOT95P280X145-5N,"IC1, IC2, IC3, IC4","Current-Sense Amplifier","Current Sense Amplifiers",,"Low- and High-Side Voltage Output"," Current-Sense Amplifiers","Texas Instruments",Generic,"-40°C ~ 125°C",,Active,,,,"ROHS3 Compliant",INA180,"Amplier ICs",,,,"Current Sense",
+4,L293D,L293D,DIP762W53P254L1969H508Q16B,"L293D_1, L293D_2, L293D_3, L293D_4","L293D H-bridge motor driver",IC_Linear,,"IC MTRDRV BIPLR 4.5-36V 16PWRDIP",STMicroelectronics,L293D,"-40°C ~ 150°C",,Active,,,,"ROHS3 Compliant",L293,"Motor Driver",,,,Bipolar,,
+2,LED_BLUE,CHIP-FLAT-B_0402,LEDC1005X25N_FLAT-B,"D2, D3",,LED,BLUE,"CHIP LED FLAT",,,,,,,,,,,CHIP,,,,FLAT_TOP,LED_BLUE,
+1,LED_RED,CHIP-FLAT-R_0402,LEDC1005X25N_FLAT-R,D1,,LED,RED,"CHIP LED FLAT",,,,,,,,,,,CHIP,,,,FLAT_TOP,LED_RED,
+1,LM7805_SOT223,LM7805_SOT223,SOT230P700X170-4,LM7802,"5V Voltage Regulator",IC_Logic,,"5V Voltage Regulator",Generic,Generic,,,,,,,,LM7805,"Voltage Regulator",,,,5V,,
+10,S2B-XH-A,S2B-XH-A,S2B-XH-A,"MOT1, MOT2, MOT3, MOT4, MOT5, MOT6, MOT7, MOT8, POWER, SS","CONN HEADER R/A 2POS 2.5MM",Headers,,"Connector Header Through Hole"," (2.50mm) ","JST Sales America Inc. ","S2B-XH-A-1(LF)(SN) ",,"-25°C ~ 85°C ",Active," (2.50mm)",,"ROHS3 Compliant",,XH,"Rectangular Connectors ",,,,Header," Male Pin"
+8,S3B-XH-A,S3B-XH-A,S3B-XH-A,"POT1, POT2, POT3, POT4, POT5, POT6, POT7, POT8",,"Header ",,"Connector Header Through Hole"," (2.50mm) ","JST Sales America Inc. ","S3B-XH-A(LF)(SN) ",,"-25°C ~ 85°C",Active," (2.50mm)",,"ROHS3 Compliant",,XH,,"Rectangular Connectors ",,,Header," Male Pin"
+1,S4B-XH-A,S4B-XH-A,S4B-XH-A,SPI,,Header,,"Connector Header Through Hole"," (2.50mm) ","JST Sales America Inc. ",S4B-XH-A(LF)(SN),,"-25°C ~ 85°C",Active," (2.50mm)",,"ROHS3 Compliant",,XH,,"Rectangular Connectors ",,,Header," Male Pin"

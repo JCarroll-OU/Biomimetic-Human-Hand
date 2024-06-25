@@ -1,0 +1,24 @@
+{
+    "Header": {
+        "Comment": "All values are metric (mm)",
+        "CreationDate": "2024-06-04T03:13:56Z",
+        "GenerationSoftware": {
+            "Application": "Fusion Electronics",
+            "Vendor": "Autodesk",
+            "Version": "9.7.0"
+        },
+        "Part": "Single"
+    },
+    "Overall": {
+        "BoardThickness": 1.57,
+        "LayerNumber": 2,
+        "Name": {
+            "ProjectId": "DC Motor Controller Mk3 v102"
+        },
+        "Owner": "James Carroll <jamescarroll630@gmail.com>",
+        "Size": {
+            "X": 64,
+            "Y": 86
+        }
+    }
+}

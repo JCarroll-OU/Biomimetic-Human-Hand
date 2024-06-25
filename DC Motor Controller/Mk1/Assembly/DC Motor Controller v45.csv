@@ -1,0 +1,13 @@
+Qty,Value,Device,Package,Parts,Description,CATEGORY,COLOR,DESCRIPTION,MANUFACTURER,MPN,OPERATING_TEMP,OPERATING_TEMPERATURE,PART_STATUS,PITCH,RATING,ROHS_COMPLIANCE,ROHS_COMPLIANT,SERIES,SPICEMODELTEXT,SPICEPREFIX,SUB-CATEGORY,THERMALLOSS,TOLERANCE,TYPE,VALUE,VOLTAGE_RATING
+4,"10 kOhm",R_CHIP-0603(1608-METRIC),RESC1608X60,"R3, R4, R6, R8","Resistor Fixed - Generic",Resistor,,,,,,,,,,,,,,,Fixed,,,,,
+8,10uF,C_CHIP-0603(1608-METRIC),CAPC1608X85,"C1, C2, C3, C4, C9, C10, C13, C14","Capacitor - Generic",Capacitor,,,,,,,,,,,,,,,,,,,,
+8,"220 Ohm",R_CHIP-0603(1608-METRIC),RESC1608X60,"R1, R2, R5, R7, R9, R10, R11, R12","Resistor Fixed - Generic",Resistor,,,,,,,,,,,,,,,Fixed,,,,,
+4,ATMEGA328P,ATMEGA328P_TQFP,TQFP32-08,"IC1, IC2, IC5, IC8","8-bit AVR Microcontroller with 32K Bytes In-System Programmable Flash",IC_Embedded,,,Microchip,ATmega328P-MMH,"-40 to 85 °C",,Active,,,,,,,,Microcontroller,,,,ATMEGA328P,
+4,L293B,L293B,DIP762W53P254L1969H508Q16B,"IC3, IC6, IC9, IC10","L293D H-bridge motor driver",IC_Linear,,"IC MTR DRV BIPOLAR 4.5-36V 16DIP",STMicroelectronics,L293B,"-40°C ~ 150°C",,Active,,,,"ROHS3 Compliant",L293,,X,"Motor Driver",,,Bipolar,,
+4,LED_BLUE,CHIP-FLAT-B_0402,LEDC1005X25N_FLAT-B,"D5, D6, D7, D8",,LED,BLUE,"CHIP LED FLAT",,,,,,,,,,,,,CHIP,,,FLAT_TOP,LED_BLUE,
+4,LED_RED,CHIP-FLAT-R_0402,LEDC1005X25N_FLAT-R,"D1, D2, D3, D4",,LED,RED,"CHIP LED FLAT",,,,,,,,,,,,,CHIP,,,FLAT_TOP,LED_RED,
+4,LM7805_SOT223,LM7805_SOT223,SOT230P700X170-4,"IC4, IC7, IC11, IC13","5V Voltage Regulator",IC_Logic,,"5V Voltage Regulator",Generic,Generic,,,,,,,,LM7805,,,"Voltage Regulator",,,5V,,
+8,PINHD-1X2/90,PINHD-1X2/90,1X02/90,"MOT1, MOT2, MOT3, MOT4, MOT5, MOT6, MOT7, MOT8","PIN HEADER",Headers,,Header," Right Angle"," 2 Position",Generic,Generic,,Generic,Active," (2.54mm)",,Generic,,Generic,,,Headers," Male Pins",,
+1,PINHD-1X2/90,PINHD-1X2/90,1X02/90,POWER,"PIN HEADER",Headers,,Header," Right Angle"," 2 Position",Generic,Generic,,Generic,Active," (2.54mm)",,Generic,,Generic,,E,Headers," Male Pins",,
+8,PINHD-1X3/90,PINHD-1X3/90,1X03/90,"POT1, POT2, POT3, POT4, POT5, POT6, POT7, POT8","PIN HEADER",Headers,,Header," Right Angle"," 3 Position",Generic,Generic,,Generic,Active," (2.54mm)",,Generic,,Generic,,J,Headers," Male Pins",,
+2,PINHD-1X4/90,PINHD-1X4/90,1X04/90,"SPI, SS","PIN HEADER",Headers,,Header," Right Angle"," 4 Position",Generic,Generic,,Generic,Active," (2.54mm)",,Generic,,Generic,,,Headers," Male Pins",,

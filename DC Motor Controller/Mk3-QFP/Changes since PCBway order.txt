@@ -1,0 +1,11 @@
+Only changes to the silkscreen have been made.
+- Fixed value for 5v linear regulator: LM7802 -> LM7805
+- Fixed layer for MCU values: Values Top -> Silkscreen Top
+- Fixed ammeter capacitor labels on silkscreen: Previously covering small part of each pad
+- Repositioned the 'WayWayWay' label to look more centered between the screen and GND label for the potentiometers
+
+Since these are only changes to the silkscreen, and the text on the pads can be scrapped off if it presents an issue, 
+a new order will not be made for these board unless they prove to be defective and the circuit itself needs to change.
+However, after this many revisions and attempts at getting this to work, this should be a functional board that will
+meet the needs of the project, so just move on if it does and keep these updated files since they have the same circuit 
+as the working model, just fixed the silkscreen.

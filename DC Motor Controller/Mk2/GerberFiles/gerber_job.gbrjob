@@ -1,0 +1,24 @@
+{
+    "Header": {
+        "Comment": "All values are metric (mm)",
+        "CreationDate": "2024-05-21T01:27:45Z",
+        "GenerationSoftware": {
+            "Application": "Fusion Electronics",
+            "Vendor": "Autodesk",
+            "Version": "9.7.0"
+        },
+        "Part": "Single"
+    },
+    "Overall": {
+        "BoardThickness": 1.57,
+        "LayerNumber": 2,
+        "Name": {
+            "ProjectId": "DC Motor Controller Mk2 v22"
+        },
+        "Owner": "James Carroll <jamescarroll630@gmail.com>",
+        "Size": {
+            "X": 63,
+            "Y": 79
+        }
+    }
+}
