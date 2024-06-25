@@ -1,0 +1,3 @@
+Unable to get signature from AtMega328p using Mk. 3 DC Motor Controller PCB. Chips could not be programmed!
+Opted for serial communication instead of SPI, which required additional hardware.
+In the spirit of keeping things simple and cost effective, the decision was made to transition to an Arduino based controller.
