@@ -1,0 +1,13 @@
+Unit cost was too high. Parts required tight tolerances which meant higher production costs. 
+Design took up too much space. More efficient and simplistic designs could be used.
+Design did not allow for compliant motion; manually moving a joint will not be detected and corrected with this setup.
+
+This part of the project helped determine design constraints that were previously unconsidered or improperly considered.
+	The problems with the design listed above led to a redesign of how the robot would look and function.
+		Potentiometers are now integrated into each joint. Since space is so limited within the hand itself,
+		all actuators will sit in the forearm assembly and pull each joint via a 1mm 304-stainless-steel 
+		control cable. Each cable is controlled by an N20 motor geared down to 300 RPM at 3V. 
+		This design change was necessitated by the fact that a servo motor would be the most ideal solution
+		if it was not for their size. Building numerous 'servos' into a single board allows for a lower
+		unit cost than using traditional servo motors and saves a lot of space since they are combined into the
+		same housing. 
