@@ -3,9 +3,9 @@ A mostly 3D-printable 21-DOF biologically inspired robotic human hand prototype.
 
 ## Progess Report:
 **March 2024:** Started preliminary research and development. 
+- Formulated general design constraints for the robot.
 - Explored multiple forms of actuation including hydraulic and electric.
 - Opted for electric due to size, simplicity, cost, and reliability.
-- Formulated general design constraints for the robot.
 
 **April 2024:** Development of DC Motor Controller PCB.
 - Designed, tested, and revised boards, eventually arriving at the third major milestone, Mk 3. 
@@ -13,10 +13,10 @@ A mostly 3D-printable 21-DOF biologically inspired robotic human hand prototype.
 - Wrote the AVR code necessary to implement motor control, SPI, and ADC.
 
 **May 2024:** Controls R&D
-- Received and assembled prototype board.
+- Received and assembled prototype boards.
 - Unable to read device signature.
 - Continuity check: OK
-- Signal integrity: Unable to access oscilliscope, ENGR lab closed.
+- Signal integrity: Unable to access oscilliscope, engineering lab is temporarly closed.
 - Hiatus, I feel dumb.
 
 **June 2024:** Continued controls R&D
@@ -38,11 +38,11 @@ A mostly 3D-printable 21-DOF biologically inspired robotic human hand prototype.
   ![Mk. 1](/Renders/DC_Motor_Controller_2024-May-16_01-15-25PM-000_CustomizedView20484802570.png)
   - Used more microcontrollers than necessary, driving the project over-budget. 
   ![Mk. 2](/Renders/DC_Motor_Controller_2024-May-17_01-13-07PM-000_CustomizedView9308964263.png)
-  - Microcontroller too small to reliably solder by hand. Too many voltage regulators, what was I thinking?
+  - Microcontrollers are too small to reliably solder by hand. Too many voltage regulators, what was I thinking?
   ![Mk. 3](/Renders/DC_Motor_Controller_Mk3_2024-May-31_03-53-12AM-000_CustomizedView27002214263_png.png)
   - See 'Reasons for deprecation' file in project folder. TL:DR; Unable to program and unable to identify cause without proper equipment. _K.I.S,S!_
   ![Mk. 4](/Renders/DC_Motor_Controller_Mk4_2024-Jun-25_07-05-43PM-000_CustomizedView16519912145_png.png)
-  - Current version of the DC Motor Controller PCB. Controls 8 motors with a PID Controller, is programmable in-circuit, and has the lowest production cost of all models. 
+  - Current version of the DC Motor Controller PCB.
   ![Mk. 4 Schematic](/Designs/Concurrent/DC%20Motor%20Controller/Mk4/Schematic.png)
   - Schematic of Mk. 4 DC Motor Controller PCB. 
   ![Mk. 4 Board Layout](/Designs/Concurrent/DC%20Motor%20Controller/Mk4/Board%20Layout.png)
@@ -56,3 +56,7 @@ A mostly 3D-printable 21-DOF biologically inspired robotic human hand prototype.
   - Complete hand assembly with updated metacarpus and all hardware expect control cables.
   ![Concept Art: Production at scale](/Renders/Sheet%20Metal%20Phalanx%20-%20Concept%20Art%20for%20Mk2.png)
   - Concept art for a future version of this project. This is meant to be produced at scale where the cost would be approximately the same as the 3D-printed counterparts.
+
+  ### This is a work in progress!
+  ### Please direct any comments or concerns at james.a.carroll-1@ou.edu.
+  More detailed reports, test results, and notes are available upon request. Contact me or see the license for information regarding the use, reproduction, and distribution of any of the content associated with this project. Thank you!
