@@ -42,10 +42,11 @@ A mostly 3D-printable 21-DOF biologically inspired robotic human hand prototype.
   ![Mk. 3](/Renders/DC_Motor_Controller_Mk3_2024-May-31_03-53-12AM-000_CustomizedView27002214263_png.png)
   - See 'Reasons for deprecation' file in project folder. TL:DR; Unable to program and unable to identify cause without proper equipment. _K.I.S,S!_
   ![Mk. 4](/Renders/DC_Motor_Controller_Mk4_2024-Jun-25_07-05-43PM-000_CustomizedView16519912145_png.png)
-  - Schematic of Mk. 4 DC Motor Controller PCB.
+  - Current version of the DC Motor Controller PCB. Controls 8 motors with a PID Controller, is programmable in-circuit, and has the lowest production cost of all models. 
   ![Mk. 4 Schematic](/Designs/Concurrent/DC%20Motor%20Controller/Mk4/Schematic.png)
-  - PCB Layout and dimensions of Mk. 4 DC Motor Controller PCB. 
+  - Schematic of Mk. 4 DC Motor Controller PCB. 
   ![Mk. 4 Board Layout](/Designs/Concurrent/DC%20Motor%20Controller/Mk4/Board%20Layout.png)
+  - PCB Layout and dimensions of Mk. 4 DC Motor Controller PCB. 
 
 - **'Skeletal' System** 
   - Many specialized parts are used in the design of a robotic hand. To keep costs low, most of these parts are 3D-printed expect where structural stability is a concern, in which case readily available metal parts are used. This is meant to closely mimic the range of motion of the human hand, expect where deemed impractical due to cost or complexity. All parts are designed for FDM printing, however, better results may be acheived by using another manufacturing method.
