@@ -36,7 +36,7 @@ A mostly 3D-printable 21-DOF biologically inspired robotic human hand prototype.
 - **DC Motor Controller PCB** 
   - This serves as the interface between hardware and software for this project. Each board contains 2 Arduino Nano microcontrollers, which each implement 4 PID controllers, for a total of 8 PID controllers per board. There are 25 motors and joints within the current design which mimic the natural range of motion of the human hand as closely as possible.
   - ![Mk. 1](/Renders/DC_Motor_Controller_2024-May-16_01-15-25PM-000_CustomizedView20484802570.png) ![Mk. 2](/Renders/DC_Motor_Controller_2024-May-17_01-13-07PM-000_CustomizedView9308964263.png) ![Mk. 3](/Renders/DC_Motor_Controller_Mk3_2024-May-31_03-53-12AM-000_CustomizedView27002214263_png.png) ![Mk. 4](/Renders/DC_Motor_Controller_Mk4_2024-Jun-25_07-05-43PM-000_CustomizedView16519912145_png.png)
-  - ![Mk. 4 Schematic](/Designs/Concurrent/DC%20Motor%20Controller/Mk4/Schematic.pdf) ![Mk. 4 Board Layout](/Designs/Concurrent/DC%20Motor%20Controller/Mk4/Board%20Layout.pdf)
+  - ![Mk. 4 Schematic](/Designs/Concurrent/DC%20Motor%20Controller/Mk4/Schematic.png) ![Mk. 4 Board Layout](/Designs/Concurrent/DC%20Motor%20Controller/Mk4/Board%20Layout.png)
 
 - **'Skeletal' System** 
   - Many specialized parts are used in the design of a robotic hand. To keep costs low, most of these parts are 3D-printed expect where structural stability is a concern, in which case readily available metal parts are used. This is meant to closely mimic the range of motion of the human hand, expect where deemed impractical due to cost or complexity. All parts are designed for FDM printing, however, better results may be acheived by using another manufacturing method.
