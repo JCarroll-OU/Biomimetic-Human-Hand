@@ -23,12 +23,15 @@
 // Set rate of serial communication
 #define BAUD_RATE 19200
 
+// Minimum PWM value for the motors to start spinning
+#define MIN_PWM_VAL 115 
+
 // PID Default values (for array initialization)
 #define PID_DEFUALT_KP 1.00
 #define PID_DEFUALT_KI 0.25
 #define PID_DEFUALT_KD 0.50
 #define PID_DEFAULT_VAL 0.0
-#define PID_MAX 5.0
+#define PID_MAX 1.0
 #define JOINT_DEFAULT_MIN_DEG 0.0
 #define JOINT_DEFAULT_MAX_DEG 90.0
 #define PID_DEFAULT_ENABLE_STATE true
@@ -41,8 +44,9 @@
 #define COMMAND_COMPLETE "Done" // Sent when no other response is required
 
 // Homing sequence parameters
-#define MOTOR_HOMING_SPEED 1
-#define MOTOR_HOMING_DELAY 25
+#define MOTOR_HOMING_SPEED 2.5
+#define MOTOR_HOMING_DELAY 5
+#define MOTOR_HOMING_TIMEOUT 250 // milliseconds
 
 // Used to save and load data after power is lost
 #include <EEPROM.h>
@@ -105,6 +109,26 @@ void Update_Potentiometer_Readings() {
   RAW_POTENTIOMETERS_RDGS[3] = analogRead(POTENTIOMETER_4);
 }
 
+// Reads the assigned analog pins corresponding to the specified potentiometer used with each PID controller.
+void Update_Potentiometer_Readings(int i) {
+  switch (i) {
+    case 1:
+      RAW_POTENTIOMETERS_RDGS[0] = analogRead(POTENTIOMETER_1);
+      return;
+    case 2:
+      RAW_POTENTIOMETERS_RDGS[1] = analogRead(POTENTIOMETER_2);
+      return;
+    case 3:
+      RAW_POTENTIOMETERS_RDGS[2] = analogRead(POTENTIOMETER_3);
+      return;
+    case 4:
+      RAW_POTENTIOMETERS_RDGS[3] = analogRead(POTENTIOMETER_4);
+      return;
+    default:
+      return;
+  }
+}
+
 /*
   Sets the motor speed of the specified motor.
   @param
@@ -119,27 +143,27 @@ void Set_Motor_Speed(int target, float spd) {
     Serial.println(ERROR_PARAMETER_BOUNDS);
     return;
   }
-  int pwmVal = int((abs(spd) / PID_MAX) * 255); // PWM has a range of [0, 255]
+  int pwmVal = ((abs(spd) / PID_MAX) * (255 - MIN_PWM_VAL)) + MIN_PWM_VAL; // PWM has a range of [0, 255]
   MOTOR_SPEEDS[target - 1] = spd;
   switch (target) {
     case 1: 
-      digitalWrite(MOTOR_1A, spd > 0 ? HIGH : LOW); // Set the direction of motor 1
-      digitalWrite(MOTOR_1B, spd > 0 ? LOW : HIGH);
+      digitalWrite(MOTOR_1A, spd == 0 ? LOW : (spd > 0 ? HIGH : LOW)); // Set the direction of motor 1
+      digitalWrite(MOTOR_1B, spd == 0 ? LOW : (spd > 0 ? LOW : HIGH));
       analogWrite(MOTOR_1_ENABLE, pwmVal); // Set the speed for motor 1
       break;
     case 2: 
-      digitalWrite(MOTOR_2A, spd > 0 ? HIGH : LOW); // Set the direction motor 2
-      digitalWrite(MOTOR_2B, spd > 0 ? LOW : HIGH);
+      digitalWrite(MOTOR_2A, spd == 0 ? LOW : (spd > 0 ? HIGH : LOW)); // Set the direction motor 2
+      digitalWrite(MOTOR_2B, spd == 0 ? LOW : (spd > 0 ? LOW : HIGH));
       analogWrite(MOTOR_2_ENABLE, pwmVal); // Set the speed for motor 2
       break;
     case 3: 
-      digitalWrite(MOTOR_3A, spd > 0 ? HIGH : LOW); // Set the direction motor 3
-      digitalWrite(MOTOR_3B, spd > 0 ? LOW : HIGH);
+      digitalWrite(MOTOR_3A, spd == 0 ? LOW : (spd > 0 ? HIGH : LOW)); // Set the direction motor 3
+      digitalWrite(MOTOR_3B, spd == 0 ? LOW : (spd > 0 ? LOW : HIGH));
       analogWrite(MOTOR_3_ENABLE, pwmVal); // Set the speed for motor 3
       break;
     case 4: 
-      digitalWrite(MOTOR_4A, spd > 0 ? HIGH : LOW); // Set the direction motor 4
-      digitalWrite(MOTOR_4B, spd > 0 ? LOW : HIGH);
+      digitalWrite(MOTOR_4A, spd == 0 ? LOW : (spd > 0 ? HIGH : LOW)); // Set the direction motor 4
+      digitalWrite(MOTOR_4B, spd == 0 ? LOW : (spd > 0 ? LOW : HIGH));
       analogWrite(MOTOR_4_ENABLE, pwmVal); // Set the speed for motor 4
       break;
     default:
@@ -220,9 +244,9 @@ void EEPROM_write_float(int location, float val) {
 */
 float EEPROM_read_float(int location) {
   byte b[] = { EEPROM.read(location + 0),
-              EEPROM.read(location + 1),
-              EEPROM.read(location + 2),
-              EEPROM.read(location + 3) };
+               EEPROM.read(location + 1),
+               EEPROM.read(location + 2),
+               EEPROM.read(location + 3) };
   float result = *((float*)b);
   return isnan(result) ? 0.0f : result;
 }
@@ -234,123 +258,85 @@ float EEPROM_read_float(int location) {
   detected, the current ADC reading is used to calculate the required bounds
   used in the conversion such that they correspond with the specified min. and 
   max joint angles (a measure in degrees).
+  Basically, this will automatically calculate the conversion factors used to convert
+  the microcontroller's output to a form we can intuitively understand (degrees).
+  This conversion is used by the PID controllers and some responses to serial commands. 
+  These may be saved using the save and load functions so homing is only required
+  when the angle output needs to be corrected. 
   @param
     int target: accepted values = {1, 2, 3, 4}
         Perform the homing sequence on this motor controller.
-
+  @return
+    bool homingComplete: true if homing was successfully completed, false otherwise
 */
-void Homing_Sequence(int target) {
+bool Homing_Sequence(int target) {
   // move the motors forward until position change is no longer registered
-  Update_Potentiometer_Readings();
-  int upper_adc_bounds = RAW_POTENTIOMETERS_RDGS[target - 1]; // adc reading corresponding to max flexure (~90 degrees)
+  Update_Potentiometer_Readings(target);                              // start by getting the inital potentiometer reading
+  int upper_adc_bounds = RAW_POTENTIOMETERS_RDGS[target - 1];
   Set_Motor_Speed(target, MOTOR_HOMING_SPEED);
-  delay(MOTOR_HOMING_DELAY);
-  Update_Potentiometer_Readings();
-  int i = 0;
+  delay(MOTOR_HOMING_DELAY);                                          // wait some time before sampling the potentiometer reading
+  Update_Potentiometer_Readings(target);                              // sample the potentiometer again so that the values are not equal (unless already stalled)
+  upper_adc_bounds = RAW_POTENTIOMETERS_RDGS[target - 1];             // updates bounds after reading the potentiometers. 
+  float start_time_ms = millis();                                     // Record the start time
   while (RAW_POTENTIOMETERS_RDGS[target - 1] != upper_adc_bounds) {
-    upper_adc_bounds = RAW_POTENTIOMETERS_RDGS[target - 1];
     delay(MOTOR_HOMING_DELAY);
-    i++; // i is the delay index tracker
-    Update_Potentiometer_Readings();
+    // if the potentiometer values does not stop changing after some period of time, stop the motors and return homing failed.
+    if (millis() >= (MOTOR_HOMING_TIMEOUT + start_time_ms)) {
+      Set_Motor_Speed(target, 0);
+      return false;
+    }
+    // Update the potentiometer value and track the ADC output
+    Update_Potentiometer_Readings(target);
+    upper_adc_bounds = RAW_POTENTIOMETERS_RDGS[target - 1];
   } // continously check that joint is moving
-  Set_Motor_Speed(target, 0);
+  Set_Motor_Speed(target, 0);                                         // Stop the motor
 
   // move the motors backwards until position change is no longer registered
-  int lower_adc_bounds = RAW_POTENTIOMETERS_RDGS[target - 1]; // adc reading corresponding to min flexure (~0 degrees)
-  Set_Motor_Speed(target, -MOTOR_HOMING_SPEED);
-  delay(MOTOR_HOMING_DELAY);
-  Update_Potentiometer_Readings();
+  Update_Potentiometer_Readings(target);              
+  int lower_adc_bounds = RAW_POTENTIOMETERS_RDGS[target - 1];
+  Set_Motor_Speed(target, -MOTOR_HOMING_SPEED);                       // move the motor in the opposite direction
+  delay(MOTOR_HOMING_DELAY);         
+  Update_Potentiometer_Readings(target);                
+  lower_adc_bounds = RAW_POTENTIOMETERS_RDGS[target - 1];
+  start_time_ms = millis();                                           // Update the start time
   while (RAW_POTENTIOMETERS_RDGS[target - 1] != lower_adc_bounds) {
-    lower_adc_bounds = RAW_POTENTIOMETERS_RDGS[target - 1];
     delay(MOTOR_HOMING_DELAY);
-    Update_Potentiometer_Readings();
-  } // continously check that joint is moving
-  Set_Motor_Speed(target, 0);
+    // if the potentiometer values does not stop changing after some period of time, stop the motors and return homing failed.
+    if (millis() >= (MOTOR_HOMING_TIMEOUT + start_time_ms)) {
+      Set_Motor_Speed(target, 0);
+      return false;
+    }
+    // Update the potentiometer value and track the ADC output
+    Update_Potentiometer_Readings(target);
+    lower_adc_bounds = RAW_POTENTIOMETERS_RDGS[target - 1];
+  }
+  Set_Motor_Speed(target, 0);                                         // Stop the motor
 
   // check that the following steps will result in a defined value, if not return homing failed
-  if ((lower_adc_bounds - upper_adc_bounds) == 0 || (JOINT_RANGE_MIN_DEG[target - 1] - JOINT_RANGE_MAX_DEG[target - 1]) == 0) {
-    Serial.println(ERROR_HOMING_FAILED);
-    return;
-  } else { // if either of the values above are zero, then the following calculation cannot be made
-    // calculate the required upper and lower bounds to output JOINT_MIN_DEG to JOINT_MAX_DEG degrees given adc readings
-    CONVERSIONS_ADC_MIN_DEG[target - 1] = ((lower_adc_bounds * JOINT_RANGE_MAX_DEG[target - 1]) - (JOINT_RANGE_MIN_DEG[target - 1] * upper_adc_bounds)) / (lower_adc_bounds - upper_adc_bounds);
+  if ((lower_adc_bounds - upper_adc_bounds) == 0 || (JOINT_RANGE_MIN_DEG[target - 1] - JOINT_RANGE_MAX_DEG[target - 1]) == 0) return false;
+  else { // if either of the values above are zero, then the following calculation cannot be made (undefined)
+    /* Calculate the required upper and lower bounds to output JOINT_MIN_DEG to JOINT_MAX_DEG degrees given adc readings
+        deg_min is the angle (in degrees) that corresponds to an ADC reading of 0
+                  (adc_min * joint_max) - (joint_min * adc_max)
+        deg_min = ---------------------------------------------
+                              adc_min - adc_max
+
+        deg_max is the angle (in degrees) that corresponds to an ADC reading of 1023
+                  (adc_min * joint_max) - (joint_min * [adc_max - 1023]) - (1023 * joint_max)
+        deg_max = ---------------------------------------------------------------------------
+                                              adc_min - adc_max
+    */
+    CONVERSIONS_ADC_MIN_DEG[target - 1] = ((lower_adc_bounds * JOINT_RANGE_MAX_DEG[target - 1]) - (JOINT_RANGE_MIN_DEG[target - 1] * upper_adc_bounds)) / (lower_adc_bounds - upper_adc_bounds); 
     CONVERSIONS_ADC_MAX_DEG[target - 1] = ((lower_adc_bounds * JOINT_RANGE_MAX_DEG[target - 1]) - (JOINT_RANGE_MIN_DEG[target - 1] * (upper_adc_bounds - 1023)) - (JOINT_RANGE_MAX_DEG[target - 1] * 1023)) / (lower_adc_bounds - upper_adc_bounds);
-    Serial.println(COMMAND_COMPLETE);
+    return true;
   }
 }
 
 /*
-  Processes a command by its ID, target ID, and parameter (if applicable).
-  @param
-    int cmd: [0, 22]
-      Command identifier. See DC Motor Controller Serial Command Assembler program for list of commands.
-  @param
-    int target: [1, 4]
-      Target identifier. Motor or controller targetted by command. 0 if unused.
-  @param
-    float param: 
-      Parameter for command. 0.0f if unused.
-
+  Saves the kP, kI, kD, and the conversion factors for each PID controller to the EEPROM.
 */
-void Process_Command(int cmd, int target, float param) {
-  if (cmd == 0) { // SERIAL_CMD_EMPTY
-    Serial.println(((float)millis() / 1000.0f)); // respond to handshake request with current runtime in seconds
-  } else if (cmd == 1) { // SERIAL_CMD_SET_TARGET_ANGLE
-    if (param > JOINT_RANGE_MAX_DEG[target - 1] || param < JOINT_RANGE_MIN_DEG[target - 1]) {
-      Serial.println(ERROR_PARAMETER_BOUNDS);
-      return;
-    }
-    PID_TARGETS[target - 1] = param;
-    Serial.println(COMMAND_COMPLETE);
-  } else if (cmd == 2) { // SERIAL_CMD_GET_TARGET_ANGLE
-    Serial.println(String(PID_TARGETS[target - 1]));
-  } else if (cmd == 3) { // SERIAL_CMD_GET_CURRENT_ANGLE
-    Serial.println(String(PID_INPUTS[target - 1]));
-  } else if (cmd == 4) { // SERIAL_CMD_SET_PID_ENABLE
-    PID_ENABLE[target - 1] = param != 0;
-    String header = "Controller_" + String(target) + " disabled";
-    if (PID_ENABLE[target - 1])
-      header = "Controller_" + String(target) + " enabled";
-    Serial.println(header);
-  } else if (cmd == 5) { // SERIAL_CMD_GET_PID_ENABLE
-    Serial.println(PID_ENABLE[target - 1] ? "Enabled" : "Disabled");
-  } else if (cmd == 6) { // SERIAL_CMD_PID_SET_P
-    PID_KP[target - 1] = param;
-    Serial.println(COMMAND_COMPLETE);
-  } else if (cmd == 7) { // SERIAL_CMD_PID_GET_P
-    Serial.println(PID_KP[target - 1]);
-  } else if (cmd == 8) { // SERIAL_CMD_PID_SET_I
-    PID_KI[target - 1] = param;
-    Serial.println(COMMAND_COMPLETE);
-  } else if (cmd == 9) { // SERIAL_CMD_PID_GET_I
-    Serial.println(PID_KI[target - 1]);
-  } else if (cmd == 10) { // SERIAL_CMD_PID_SET_D
-    PID_KD[target - 1] = param;
-    Serial.println(COMMAND_COMPLETE);
-  } else if (cmd == 11) { // SERIAL_CMD_PID_GET_D
-    Serial.println(PID_KD[target - 1]);
-  } else if (cmd == 12) { // SERIAL_CMD_SET_ANGLE_CONV_DEG_MIN
-    CONVERSIONS_ADC_MIN_DEG[target - 1] = param;
-    Serial.println(COMMAND_COMPLETE);
-  } else if (cmd == 13) { // SERIAL_CMD_GET_ANGLE_CONV_DEG_MIN
-    Serial.println(CONVERSIONS_ADC_MIN_DEG[target - 1]);
-  } else if (cmd == 14) { // SERIAL_CMD_SET_ANGLE_CONV_DEG_MAX
-    CONVERSIONS_ADC_MAX_DEG[target - 1] = param;
-    Serial.println(COMMAND_COMPLETE);
-  } else if (cmd == 15) { // SERIAL_CMD_GET_ANGLE_CONV_DEG_MAX
-    Serial.println(CONVERSIONS_ADC_MAX_DEG[target - 1]);
-  } else if (cmd == 16) { // SERIAL_CMD_SET_ANGLE_JOINT_DEG_MIN
-    JOINT_RANGE_MIN_DEG[target - 1] = param;
-    Serial.println(COMMAND_COMPLETE);
-  } else if (cmd == 17) { // SERIAL_CMD_GET_ANGLE_JOINT_DEG_MIN
-    Serial.println(JOINT_RANGE_MIN_DEG[target - 1]);
-  } else if (cmd == 18) { // SERIAL_CMD_SET_ANGLE_JOINT_DEG_MAX
-    JOINT_RANGE_MAX_DEG[target - 1] = param;
-    Serial.println(COMMAND_COMPLETE);
-  } else if (cmd == 19) { // SERIAL_CMD_GET_ANGLE_JOINT_DEG_MAX
-    Serial.println(JOINT_RANGE_MAX_DEG[target - 1]);
-  } else if (cmd == 20) { // SERIAL_CMD_SAVE_SETTINGS
-    for (int i = 0; i < 4; i++) { 
+void Save_Settings() {
+  for (int i = 0; i < 4; i++) { 
       EEPROM_write_float(EEPROM_ADDR_PID_KP[i], PID_KP[i]);
       EEPROM_write_float(EEPROM_ADDR_PID_KI[i], PID_KI[i]);
       EEPROM_write_float(EEPROM_ADDR_PID_KD[i], PID_KD[i]);
@@ -359,9 +345,13 @@ void Process_Command(int cmd, int target, float param) {
       EEPROM_write_float(EEPROM_ADDR_JOINT_MIN_DEG[i], JOINT_RANGE_MIN_DEG[i]);
       EEPROM_write_float(EEPROM_ADDR_JOINT_MAX_DEG[i], JOINT_RANGE_MAX_DEG[i]);
     }
-    Serial.println(COMMAND_COMPLETE);
-  } else if (cmd == 21) { // SERIAL_CMD_LOAD_SETTINGS
-    for (int i = 0; i < 4; i++) { 
+}
+
+/*
+  Loads the kP, kI, kD, and the conversion factors for each PID controller from the EEPROM.
+*/
+void Load_Settings() {
+  for (int i = 0; i < 4; i++) { 
       PID_KP[i] = EEPROM_read_float(EEPROM_ADDR_PID_KP[i]);
       PID_KI[i] = EEPROM_read_float(EEPROM_ADDR_PID_KI[i]);
       PID_KD[i] = EEPROM_read_float(EEPROM_ADDR_PID_KD[i]);
@@ -370,16 +360,123 @@ void Process_Command(int cmd, int target, float param) {
       JOINT_RANGE_MIN_DEG[i] = EEPROM_read_float(EEPROM_ADDR_JOINT_MIN_DEG[i]);
       JOINT_RANGE_MAX_DEG[i] = EEPROM_read_float(EEPROM_ADDR_JOINT_MAX_DEG[i]);
     }
-    Serial.println(COMMAND_COMPLETE);
-  } else if (cmd == 22) { // SERIAL_CMD_SET_MOTOR_SPEED
-    Set_Motor_Speed(target, param);
-    Serial.println(COMMAND_COMPLETE);
-  } else if (cmd == 23) { // SERIAL_CMD_GET_MOTOR_SPEED
-    Serial.println(MOTOR_SPEEDS[target - 1]);
-  } else if (cmd == 24) { // SERIAL_CMD_HOMING_SEQUENCE
-    Homing_Sequence(target); // this will handle to response to this command, no need for Serial.println(COMMAND_COMPLETE);
-  } else { // UNKNOWN COMMAND
-    Serial.println(ERROR_UNKNOWN_COMMAND);
+}
+
+/*
+  Processes a command by its ID, target ID, and parameter (if applicable).
+  @param
+    int cmd: [0, 24]
+      Command identifier. See DC Motor Controller Serial Command Assembler program for list of commands.
+  @param
+    int target: [1, 4]
+      Target identifier. Motor or controller targetted by command. 0 if unused.
+  @param
+    float param: Acceptable value range varies by function.
+      Parameter for command. 0.0f if unused. 
+
+*/
+void Process_Command(int cmd, int target, float param) {
+  switch (cmd) { // 98 lines... there must be a better way besides of making an array of function pointers (index out-of-bounds presents too much risk)
+    // real talk tho, why did a change from if .. elif statements to a switch statement reduce program storage usage from 91% to 74%. That's wild
+    case 0: // SERIAL_CMD_EMPTY
+      // respond to handshake request with current runtime in seconds
+      Serial.println(((float)millis() / 1000.0f)); 
+      break;
+    case 1: // SERIAL_CMD_SET_TARGET_ANGLE
+      if (param > JOINT_RANGE_MAX_DEG[target - 1] || param < JOINT_RANGE_MIN_DEG[target - 1]) {
+        Serial.println(ERROR_PARAMETER_BOUNDS);
+        return;
+      }
+      PID_TARGETS[target - 1] = param;
+      Serial.println(COMMAND_COMPLETE);
+      break;
+    case 2: // SERIAL_CMD_GET_TARGET_ANGLE
+      Serial.println(String(PID_TARGETS[target - 1]));
+      break;
+    case 3: // SERIAL_CMD_GET_CURRENT_ANGLE
+      Serial.println(String(PID_INPUTS[target - 1]));
+      break;
+    case 4: // SERIAL_CMD_SET_PID_ENABLE
+      PID_ENABLE[target - 1] = param != 0;
+      String header = "Controller_" + String(target) + " disabled";
+      if (PID_ENABLE[target - 1]) // there are better ways of doing this, but they all give some kind of error
+        header = "Controller_" + String(target) + " enabled";
+      Serial.println(header);
+      break;
+    case 5: // SERIAL_CMD_GET_PID_ENABLE
+      Serial.println(PID_ENABLE[target - 1] ? "Enabled" : "Disabled");
+      break;
+    case 6: // SERIAL_CMD_PID_SET_P
+      PID_KP[target - 1] = param;
+      Serial.println(COMMAND_COMPLETE);
+      break;
+    case 7: // SERIAL_CMD_PID_GET_P
+      Serial.println(PID_KP[target - 1]);
+      break;
+    case 8: // SERIAL_CMD_PID_SET_I
+      PID_KI[target - 1] = param;
+      Serial.println(COMMAND_COMPLETE);
+      break;
+    case 9: // SERIAL_CMD_PID_GET_I
+      Serial.println(PID_KI[target - 1]);
+      break;
+    case 10: // SERIAL_CMD_PID_SET_D
+      PID_KD[target - 1] = param;
+      Serial.println(COMMAND_COMPLETE);
+      break;
+    case 11: // SERIAL_CMD_PID_GET_D
+      Serial.println(PID_KD[target - 1]);
+      break;
+    case 12: // SERIAL_CMD_SET_ANGLE_CONV_DEG_MIN
+      CONVERSIONS_ADC_MIN_DEG[target - 1] = param;
+      Serial.println(COMMAND_COMPLETE);
+      break;
+    case 13: // SERIAL_CMD_GET_ANGLE_CONV_DEG_MIN
+      Serial.println(CONVERSIONS_ADC_MIN_DEG[target - 1]);
+      break;
+    case 14: // SERIAL_CMD_SET_ANGLE_CONV_DEG_MAX
+      CONVERSIONS_ADC_MAX_DEG[target - 1] = param;
+      Serial.println(COMMAND_COMPLETE);
+      break;
+    case 15: // SERIAL_CMD_GET_ANGLE_CONV_DEG_MAX
+      Serial.println(CONVERSIONS_ADC_MAX_DEG[target - 1]);
+      break;
+    case 16: // SERIAL_CMD_SET_ANGLE_JOINT_DEG_MIN
+      JOINT_RANGE_MIN_DEG[target - 1] = param;
+      Serial.println(COMMAND_COMPLETE);
+      break;
+    case 17: // SERIAL_CMD_GET_ANGLE_JOINT_DEG_MIN
+      Serial.println(JOINT_RANGE_MIN_DEG[target - 1]);
+      break;
+    case 18: // SERIAL_CMD_SET_ANGLE_JOINT_DEG_MAX
+      JOINT_RANGE_MAX_DEG[target - 1] = param;
+      Serial.println(COMMAND_COMPLETE);
+      break;
+    case 19: // SERIAL_CMD_GET_ANGLE_JOINT_DEG_MAX
+      Serial.println(JOINT_RANGE_MAX_DEG[target - 1]);
+      break;
+    case 20: // SERIAL_CMD_SAVE_SETTINGS
+      Save_Settings();
+      Serial.println(COMMAND_COMPLETE);
+      break;
+    case 21: // SERIAL_CMD_LOAD_SETTINGS
+      Load_Settings();
+      Serial.println(COMMAND_COMPLETE);
+      break;
+    case 22: // SERIAL_CMD_SET_MOTOR_SPEED
+      Set_Motor_Speed(target, param);
+      Serial.println(COMMAND_COMPLETE);
+      break;
+    case 23: // SERIAL_CMD_GET_MOTOR_SPEED
+      Serial.println(MOTOR_SPEEDS[target - 1]);
+      break;
+    case 24: // SERIAL_CMD_HOMING_SEQUENCE
+      if (Homing_Sequence(target)) Serial.println(COMMAND_COMPLETE);
+      else Serial.println(ERROR_HOMING_FAILED);
+      break;
+    default: // UNKNOWN COMMAND
+      Serial.println(ERROR_UNKNOWN_COMMAND);
+      break;
   }
 }
 
@@ -414,7 +511,7 @@ void loop() {
   Process_Serial();
 
   digitalWrite(LED_BUILTIN, HIGH);
-  delay(25);
+  delay(25); // this is only here for debug purposes, PIDs could be updated much quicker without this
 
   // Reads the potentiometers and converts to degrees, then updates the PID controllers, and finally, sets the motor speeds.
   Update_PID_Controllers();
