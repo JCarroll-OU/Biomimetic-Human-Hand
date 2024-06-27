@@ -26,7 +26,7 @@
 // Minimum PWM value for the motors to start spinning
 #define MIN_PWM_VAL 115 
 
-// PID Default values (for array initialization)
+// PID values (for array initialization)
 #define PID_DEFUALT_KP 1.00
 #define PID_DEFUALT_KI 0.25
 #define PID_DEFUALT_KD 0.50
@@ -36,11 +36,17 @@
 #define JOINT_DEFAULT_MAX_DEG 90.0
 #define PID_DEFAULT_ENABLE_STATE true
 
+// PID Autotune values
+#define PID_AUTOTUNE_DEFAULT_GAIN 1e-6
+#define PID_AUTOTUNE_OSC_SPD (PID_MAX / 2)
+#define PID_AUTOTUNING_DELAY 25
+
 // Error strings, used to reduce the nunber of unique messages in order to save memory
 #define ERROR_INVALID_TARGET "Error: Invalid target ID"
 #define ERROR_UNKNOWN_COMMAND "Error: Unknown command ID"
 #define ERROR_PARAMETER_BOUNDS "Error: Parameter outside acceptable range"
 #define ERROR_HOMING_FAILED "Error: Homing sequence failed"
+#define ERROR_PID_AUTOTUNE_FAILED "ERROR: PID autotuning sequence failed"
 #define COMMAND_COMPLETE "Done" // Sent when no other response is required
 
 // Homing sequence parameters
@@ -333,6 +339,68 @@ bool Homing_Sequence(int target) {
 }
 
 /*
+  Ziegler-Nicholas PID auto-tuning method. Calculates the ultimate gain 'Ku' and 'Tu'
+  after oscillating the motors and monitoring the response. Returns true if tuning is
+  successful, otherwise returns false.
+  @param
+    int target: accepted values = {1, 2, 3, 4}
+        Perform the auto-tuning sequence on this PID controller.
+  @param
+    float duration: All positive values are acceptable.
+        Time (in seconds) to oscillate the motor for before performing any calculations.
+*/
+bool PID_Autotune(int target, float duration) {
+  float minInput = PID_AUTOTUNE_DEFAULT_GAIN;
+  float maxInput = -PID_AUTOTUNE_DEFAULT_GAIN;
+  float Ku = PID_DEFAULT_VAL;
+  float Tu = PID_DEFAULT_VAL;
+  unsigned long startTime = millis();
+
+  // Set the PID target to the current angle. 
+  // It is recommended that you set the PID target to the mid-point of the range of motion as demonstrated below:
+  //  ((JOINT_RANGE_MAX_DEG[target - 1] - JOINT_RANGE_MIN_DEG[target - 1]) / 2) + JOINT_RANGE_MIN_DEG[target - 1];
+  // Then allow time for the PID controller to acheieve that position. Then run this function. This will help avoid
+  // the oscillations from driving joints outside their range of motion. 
+  PID_TARGETS[target - 1] = PID_INPUTS[target - 1];
+  // Drive the motor forward to begin oscillating
+  Set_Motor_Speed(target, PID_AUTOTUNE_OSC_SPD);
+
+  float deltaTime = millis() - startTime;
+  while ((deltaTime / 1000.0f) < duration) {
+    deltaTime = millis() - startTime;
+
+    // Find min and max input values to determine oscillation
+    if (PID_INPUTS[target - 1] < minInput) minInput = PID_INPUTS[target - 1];
+    if (PID_INPUTS[target - 1] > maxInput) maxInput = PID_INPUTS[target - 1];
+
+    // Toggle the motor direction to induce oscillations
+    Set_Motor_Speed(target, -MOTOR_SPEEDS[target - 1]);
+
+    // Check if we have a complete oscillation
+    if ((PID_INPUTS[target - 1] > PID_TARGETS[target - 1] && PID_LastInput[target - 1] <= PID_TARGETS[target - 1]) ||
+        (PID_INPUTS[target - 1] < PID_TARGETS[target - 1] && PID_LastInput[target - 1] >= PID_TARGETS[target - 1])) {
+      double oscillationTime = deltaTime / 1000.0; // Oscillation period in seconds
+      if (Tu == 0)
+        Tu = oscillationTime;
+      else
+        Tu = (Tu + oscillationTime) / 2.0; // Average period
+      startTime = millis();
+      minInput = PID_AUTOTUNE_DEFAULT_GAIN;
+      maxInput = -PID_AUTOTUNE_DEFAULT_GAIN;
+    }
+
+    // Wait some time so the motors have time to move past their target
+    delay(PID_AUTOTUNING_DELAY);
+  }
+
+  Ku = PID_MAX * ((255 - MIN_PWM_VAL) / (maxInput - minInput));
+  PID_KP[target - 1] = 0.6 * Ku; // In accordance with the Ziegler-Nicholas tuning method, KP is approximately 60% of Ku.
+  PID_KI[target - 1] = 2 * PID_KP[target - 1] / Tu; // KI = (2 * KP) / Tu
+  PID_KD[target - 1] = PID_KP[target - 1] * Tu / 8; // KD = (KP * Tu) / 8
+  return true;
+}
+
+/*
   Saves the kP, kI, kD, and the conversion factors for each PID controller to the EEPROM.
 */
 void Save_Settings() {
@@ -473,6 +541,15 @@ void Process_Command(int cmd, int target, float param) {
     case 24: // SERIAL_CMD_HOMING_SEQUENCE
       if (Homing_Sequence(target)) Serial.println(COMMAND_COMPLETE);
       else Serial.println(ERROR_HOMING_FAILED);
+      break;
+    case 25: // SERIAL_CMD_PID_AUTOTUNE
+      if (param <= 0) { // time value should not be negative or zero
+        Serial.println(ERROR_PARAMETER_BOUNDS);
+        break;
+      }
+      if (PID_Autotune(target, param))
+        Serial.println(COMMAND_COMPLETE);
+      else Serial.println(ERROR_PID_AUTOTUNE_FAILED);
       break;
     default: // UNKNOWN COMMAND
       Serial.println(ERROR_UNKNOWN_COMMAND);
