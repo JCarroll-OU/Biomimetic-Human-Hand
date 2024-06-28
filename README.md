@@ -37,7 +37,7 @@ Joints are actuated via 1mm-diameter 304-Stainless-Steel cable driven by motors 
 
 ## Project Highlights:
 - **DC Motor Controller PCB** 
-  - These PCBs implement a PID control algorithm complete with an auto-tuning feature. Each board can support up to 8 motors, so 4 are required to drive the 25 joints present within this design. Each board is designed to handle a voltage input of 7-12v. 
+  - These PCBs implement a PID control algorithm complete with an auto-tuning feature. Each board can support up to 8 motors, so 4 are required to drive the 25 joints present within this design. Each board is designed to operate at 12v. _Air cooling recommended if using > 1A for periods > 1s_
   ![Mk. 4 Schematic](/Designs/Concurrent/DC%20Motor%20Controller/Mk4/Schematic.png)
   - Schematic of Mk. 4 DC Motor Controller PCB. 
   ![Mk. 4 Board Layout](/Designs/Concurrent/DC%20Motor%20Controller/Mk4/Board%20Layout.png)
@@ -48,10 +48,9 @@ Joints are actuated via 1mm-diameter 304-Stainless-Steel cable driven by motors 
   ![WIP: Forearm Assembly, Top](/Renders/assembly%20guide%20top.png)
   ![WIP: Forearm Assembly, Right](/Renders/assembly_guide_right.png)
   ![WIP: Forearm Assembly, Render](/Renders/Phalanx_Assembly_2024-Jun-28_02-02-48AM-000_CustomizedView21154948335_png.png)
-  - Finger assemblies in black, palm assembly in yellow, and wrist is in blue.
+  - Finger assemblies in black, palm assembly in yellow, and wrist in blue.
   ![Concept Art: Production at scale](/Renders/Sheet%20Metal%20Phalanx%20-%20Concept%20Art%20for%20Mk2.png)
-  - Concept art for a future version of this project. This is meant to be produced at scale where the cost would be approximately the same as the 3D-printed counterparts.
+  - Folded sheet metal finger assembly concept art.
 
   ### This is a work in progress!
-  ### Please direct any comments or concerns at james.a.carroll-1@ou.edu.
   More detailed reports, test results, and notes are available upon request. Contact me or see the license for information regarding the use, reproduction, and distribution of any of the content associated with this project. Thank you!
