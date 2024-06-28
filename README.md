@@ -1,6 +1,6 @@
 # Biomimetric Human Hand
 A mostly 3D-printable 21-DOF biologically inspired robotic human hand prototype.
-Joints are actuated via 1mm-diameter 304-Stainless-Steel cable driven by motors in the forearm assembly. These cables are fed through 1mm-ID, 2mm-OD PTFE tubing that runs from the forearm to joints. Additionally, these cables will be driven by N20 motors geared down to 300 RPM (at 3v). 
+Joints are actuated via 1mm-diameter 304-Stainless-Steel cable driven by motors in the forearm assembly. These cables are fed through 1mm-ID, 2mm-OD PTFE tubing that runs from the forearm to joints. Additionally, these cables will be driven by N20 motors geared down to 300 RPM.
 
 ## Progess Report:
 **March 2024:** Started preliminary research and development. 
@@ -48,6 +48,7 @@ Joints are actuated via 1mm-diameter 304-Stainless-Steel cable driven by motors 
   ![WIP: Forearm Assembly, Top](/Renders/assembly%20guide%20top.png)
   ![WIP: Forearm Assembly, Right](/Renders/assembly_guide_right.png)
   ![WIP: Forearm Assembly, Render](/Renders/Phalanx_Assembly_2024-Jun-28_02-02-48AM-000_CustomizedView21154948335_png.png)
+  - Finger assemblies in black, palm assembly in yellow, and wrist is in blue.
   ![Concept Art: Production at scale](/Renders/Sheet%20Metal%20Phalanx%20-%20Concept%20Art%20for%20Mk2.png)
   - Concept art for a future version of this project. This is meant to be produced at scale where the cost would be approximately the same as the 3D-printed counterparts.
 
