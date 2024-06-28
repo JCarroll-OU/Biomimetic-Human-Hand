@@ -1,5 +1,6 @@
 # Biomimetric Human Hand
 A mostly 3D-printable 21-DOF biologically inspired robotic human hand prototype.
+Joints are actuated via 1mm-diameter 304-Stainless-Steel cable driven by motors in the forearm assembly. These cables are fed through 1mm-ID, 2mm-OD PTFE tubing that runs from the forearm to joints. Additionally, these cables will be driven by N20 motors geared down to 300 RPM (at 3v). 
 
 ## Progess Report:
 **March 2024:** Started preliminary research and development. 
@@ -28,32 +29,25 @@ A mostly 3D-printable 21-DOF biologically inspired robotic human hand prototype.
 - Setup file structure such that concurrent and deprecated parts of the project are in separate folders.
 - Separated project components into software and hardware categories.
 - Changed the shape of the 'metacarpus' to allow for the thumb to flex towards the palm of the hand. 
-  - Parts are currently very difficult to successfully print and prepare for use. Revise parts such that they can be printed with ease.
-  - The changes to the 'skeletal' system of the robot means that the kinemtics must be recalculated. 
-  - Without the control cable and PTFE tubing on-hand, theres no way to test the range of motion without manually manipulating the joints. 
+
+**Recent changes:** Started designed forearm assembly, which houses the motors and controller PCBs. 
+- Integrated MS90S servo into wrist assembly. 
+- Fixed clearance issues that resulted in low success rate for FDM prints.
+- More renders and documentation. 
 
 ## Project Highlights:
 - **DC Motor Controller PCB** 
-  - This serves as the interface between hardware and software for this project. Each board contains 2 Arduino Nano microcontrollers, which each implement 4 PID controllers, for a total of 8 PID controllers per board. There are 25 motors and joints within the current design which mimic the natural range of motion of the human hand as closely as possible.
-  ![Mk. 1](/Renders/DC_Motor_Controller_2024-May-16_01-15-25PM-000_CustomizedView20484802570.png)
-  - Used more microcontrollers than necessary, driving the project over-budget. 
-  ![Mk. 2](/Renders/DC_Motor_Controller_2024-May-17_01-13-07PM-000_CustomizedView9308964263.png)
-  - Microcontrollers are too small to reliably solder by hand. Too many voltage regulators, what was I thinking?
-  ![Mk. 3](/Renders/DC_Motor_Controller_Mk3_2024-May-31_03-53-12AM-000_CustomizedView27002214263_png.png)
-  - See 'Reasons for deprecation' file in project folder. TL:DR; Unable to program and unable to identify cause without proper equipment. _K.I.S,S!_
-  ![Mk. 4](/Renders/DC_Motor_Controller_Mk4_2024-Jun-25_07-05-43PM-000_CustomizedView16519912145_png.png)
-  - Current version of the DC Motor Controller PCB.
+  - These PCBs implement a PID control algorithm complete with an auto-tuning feature. Each board can support up to 8 motors, so 4 are required to drive the 25 joints present within this design. Each board is designed to handle a voltage input of 7-12v. 
   ![Mk. 4 Schematic](/Designs/Concurrent/DC%20Motor%20Controller/Mk4/Schematic.png)
   - Schematic of Mk. 4 DC Motor Controller PCB. 
   ![Mk. 4 Board Layout](/Designs/Concurrent/DC%20Motor%20Controller/Mk4/Board%20Layout.png)
   - PCB Layout and dimensions of Mk. 4 DC Motor Controller PCB. 
 
 - **'Skeletal' System** 
-  - Many specialized parts are used in the design of a robotic hand. To keep costs low, most of these parts are 3D-printed expect where structural stability is a concern, in which case readily available metal parts are used. This is meant to closely mimic the range of motion of the human hand, expect where deemed impractical due to cost or complexity. All parts are designed for FDM printing, however, better results may be acheived by using another manufacturing method.
-  ![Phalanx Assembly: 3D-Printed Parts only](/Renders/Phalanx_Assembly_2024-Jun-23_05-39-12PM-000_CustomizedView3688566158_png.png)
-  - Palm assembly in black (10 parts) and fingers in white (3 parts each). 3D-printed parts only.
-  ![Phalanx Assembly: Complete](/Renders/Phalanx_Assembly_2024-Jun-24_08-13-17PM-000_CustomizedView18257921723_png.png)
-  - Complete hand assembly with updated metacarpus and all hardware expect control cables.
+  - Cost was a major design consideration for this prototype. Most parts are designed for 3D-printing (FDM but SLS/SLA is preferrable). Those that are not, are readily available and thus, cheap. 
+  ![WIP: Forearm Assembly, Top](/Renders/assembly%20guide%20top.png)
+  ![WIP: Forearm Assembly, Right](/Renders/assembly_guide_right.png)
+  ![WIP: Forearm Assembly, Render](/Renders/)
   ![Concept Art: Production at scale](/Renders/Sheet%20Metal%20Phalanx%20-%20Concept%20Art%20for%20Mk2.png)
   - Concept art for a future version of this project. This is meant to be produced at scale where the cost would be approximately the same as the 3D-printed counterparts.
 
