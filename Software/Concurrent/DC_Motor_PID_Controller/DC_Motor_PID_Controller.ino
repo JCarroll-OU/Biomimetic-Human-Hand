@@ -430,6 +430,141 @@ void Load_Settings() {
     }
 }
 
+void SERIAL_CMD_EMPTY() {
+  // respond to handshake request with current runtime in seconds
+  Serial.println(((float)millis() / 1000.0f)); 
+}
+
+void SERIAL_CMD_SET_TARGET_ANGLE(int target, float param) {
+  if (param > JOINT_RANGE_MAX_DEG[target - 1] || param < JOINT_RANGE_MIN_DEG[target - 1]) {
+    Serial.println(ERROR_PARAMETER_BOUNDS);
+    return;
+  }
+  PID_TARGETS[target - 1] = param;
+  Serial.println(COMMAND_COMPLETE);
+}
+
+void SERIAL_CMD_GET_TARGET_ANGLE(int target) {
+  Serial.println(String(PID_TARGETS[target - 1]));
+}
+
+void SERIAL_CMD_GET_CURRENT_ANGLE(int target) {
+  Serial.println(String(PID_INPUTS[target - 1]));
+}
+
+void SERIAL_CMD_SET_PID_ENABLE(int target, float param) {
+  PID_ENABLE[target - 1] = param != 0;
+  String header = "Controller_" + String(target) + " disabled";
+  if (PID_ENABLE[target - 1]) // there are better ways of doing this, but they all give some kind of error
+    header = "Controller_" + String(target) + " enabled";
+  Serial.println(header);
+}
+
+void SERIAL_CMD_GET_PID_ENABLE(int target) {
+  String resp = "Disabled";
+  if (PID_ENABLE[target - 1]) // there are better ways of doing this, but they all give some kind of error
+    resp = "Enabled";
+  Serial.println(resp);
+}
+
+void SERIAL_CMD_PID_SET_P(int target, float param) {
+  PID_KP[target - 1] = param;
+  Serial.println(COMMAND_COMPLETE);
+}
+
+void SERIAL_CMD_PID_GET_P(int target) {
+  Serial.println(PID_KP[target - 1]);
+}
+
+void SERIAL_CMD_PID_SET_I(int target, float param) {
+  PID_KI[target - 1] = param;
+  Serial.println(COMMAND_COMPLETE);
+}
+
+void SERIAL_CMD_PID_GET_I(int target) {
+  Serial.println(PID_KI[target - 1]);
+}
+
+void SERIAL_CMD_PID_SET_D(int target, float param) {
+  PID_KD[target - 1] = param;
+  Serial.println(COMMAND_COMPLETE);
+}
+
+void SERIAL_CMD_PID_GET_D(int target) {
+  Serial.println(PID_KD[target - 1]);
+}
+
+void SERIAL_CMD_SET_ANGLE_CONV_DEG_MIN(int target, float param) {
+  CONVERSIONS_ADC_MIN_DEG[target - 1] = param;
+  Serial.println(COMMAND_COMPLETE);
+}
+
+void SERIAL_CMD_GET_ANGLE_CONV_DEG_MIN(int target) {
+  Serial.println(CONVERSIONS_ADC_MIN_DEG[target - 1]);
+}
+
+void SERIAL_CMD_SET_ANGLE_CONV_DEG_MAX(int target, float param) {
+  CONVERSIONS_ADC_MAX_DEG[target - 1] = param;
+  Serial.println(COMMAND_COMPLETE);
+}
+
+void SERIAL_CMD_GET_ANGLE_CONV_DEG_MAX(int target) {
+  Serial.println(CONVERSIONS_ADC_MAX_DEG[target - 1]);
+}
+
+void SERIAL_CMD_SET_ANGLE_JOINT_DEG_MIN(int target, float param) {
+  JOINT_RANGE_MIN_DEG[target - 1] = param;
+  Serial.println(COMMAND_COMPLETE);
+}
+
+void SERIAL_CMD_GET_ANGLE_JOINT_DEG_MIN(int target) {
+  Serial.println(JOINT_RANGE_MIN_DEG[target - 1]);
+}
+
+void SERIAL_CMD_SET_ANGLE_JOINT_DEG_MAX(int target, float param) {
+  JOINT_RANGE_MAX_DEG[target - 1] = param;
+  Serial.println(COMMAND_COMPLETE);
+}
+
+void SERIAL_CMD_GET_ANGLE_JOINT_DEG_MAX(int target) {
+  Serial.println(JOINT_RANGE_MAX_DEG[target - 1]);
+}
+
+void SERIAL_CMD_SAVE_SETTINGS() {
+  Save_Settings();
+  Serial.println(COMMAND_COMPLETE);
+}
+
+void SERIAL_CMD_LOAD_SETTINGS() {
+  Load_Settings();
+  Serial.println(COMMAND_COMPLETE);
+}
+
+void SERIAL_CMD_SET_MOTOR_SPEED(int target, float param) {
+  Set_Motor_Speed(target, param);
+  Serial.println(COMMAND_COMPLETE);
+}
+
+void SERIAL_CMD_GET_MOTOR_SPEED(int target) {
+  Serial.println(MOTOR_SPEEDS[target - 1]);
+}
+
+void SERIAL_CMD_HOMING_SEQUENCE(int target){
+  if (Homing_Sequence(target)) Serial.println(COMMAND_COMPLETE);
+  else Serial.println(ERROR_HOMING_FAILED);
+}
+
+void SERIAL_CMD_PID_AUTOTUNE(int target, float param) {
+  if (param <= 0) { // time value should not be negative or zero
+    Serial.println(ERROR_PARAMETER_BOUNDS);
+    return;
+  }
+  if (PID_Autotune(target, param))
+    Serial.println(COMMAND_COMPLETE);
+  else Serial.println(ERROR_PID_AUTOTUNE_FAILED);
+  return;
+}
+
 /*
   Processes a command by its ID, target ID, and parameter (if applicable).
   @param
@@ -444,112 +579,84 @@ void Load_Settings() {
 
 */
 void Process_Command(int cmd, int target, float param) {
-  switch (cmd) { // 98 lines... there must be a better way besides of making an array of function pointers (index out-of-bounds presents too much risk)
-    // real talk tho, why did a change from if .. elif statements to a switch statement reduce program storage usage from 91% to 74%. That's wild
+  switch (cmd) {
     case 0: // SERIAL_CMD_EMPTY
-      // respond to handshake request with current runtime in seconds
-      Serial.println(((float)millis() / 1000.0f)); 
+      SERIAL_CMD_EMPTY();
       break;
     case 1: // SERIAL_CMD_SET_TARGET_ANGLE
-      if (param > JOINT_RANGE_MAX_DEG[target - 1] || param < JOINT_RANGE_MIN_DEG[target - 1]) {
-        Serial.println(ERROR_PARAMETER_BOUNDS);
-        return;
-      }
-      PID_TARGETS[target - 1] = param;
-      Serial.println(COMMAND_COMPLETE);
+      SERIAL_CMD_SET_TARGET_ANGLE(target, param);
       break;
     case 2: // SERIAL_CMD_GET_TARGET_ANGLE
-      Serial.println(String(PID_TARGETS[target - 1]));
+      SERIAL_CMD_GET_TARGET_ANGLE(target);
       break;
     case 3: // SERIAL_CMD_GET_CURRENT_ANGLE
-      Serial.println(String(PID_INPUTS[target - 1]));
+      SERIAL_CMD_GET_CURRENT_ANGLE(target);
       break;
     case 4: // SERIAL_CMD_SET_PID_ENABLE
-      PID_ENABLE[target - 1] = param != 0;
-      String header = "Controller_" + String(target) + " disabled";
-      if (PID_ENABLE[target - 1]) // there are better ways of doing this, but they all give some kind of error
-        header = "Controller_" + String(target) + " enabled";
-      Serial.println(header);
+      SERIAL_CMD_SET_PID_ENABLE(target, param);
       break;
     case 5: // SERIAL_CMD_GET_PID_ENABLE
-      Serial.println(PID_ENABLE[target - 1] ? "Enabled" : "Disabled");
+      SERIAL_CMD_GET_PID_ENABLE(target);
       break;
     case 6: // SERIAL_CMD_PID_SET_P
-      PID_KP[target - 1] = param;
-      Serial.println(COMMAND_COMPLETE);
+      SERIAL_CMD_PID_SET_P(target, param);
       break;
     case 7: // SERIAL_CMD_PID_GET_P
-      Serial.println(PID_KP[target - 1]);
+      SERIAL_CMD_PID_GET_P(target);
       break;
     case 8: // SERIAL_CMD_PID_SET_I
-      PID_KI[target - 1] = param;
-      Serial.println(COMMAND_COMPLETE);
+      SERIAL_CMD_PID_SET_I(target, param);
       break;
     case 9: // SERIAL_CMD_PID_GET_I
-      Serial.println(PID_KI[target - 1]);
+      SERIAL_CMD_PID_GET_I(target);
       break;
     case 10: // SERIAL_CMD_PID_SET_D
-      PID_KD[target - 1] = param;
-      Serial.println(COMMAND_COMPLETE);
+      SERIAL_CMD_PID_SET_D(target, param);
       break;
     case 11: // SERIAL_CMD_PID_GET_D
-      Serial.println(PID_KD[target - 1]);
+      SERIAL_CMD_PID_GET_D(target);
       break;
     case 12: // SERIAL_CMD_SET_ANGLE_CONV_DEG_MIN
-      CONVERSIONS_ADC_MIN_DEG[target - 1] = param;
-      Serial.println(COMMAND_COMPLETE);
+      SERIAL_CMD_SET_ANGLE_CONV_DEG_MIN(target, param);
       break;
     case 13: // SERIAL_CMD_GET_ANGLE_CONV_DEG_MIN
-      Serial.println(CONVERSIONS_ADC_MIN_DEG[target - 1]);
+      SERIAL_CMD_GET_ANGLE_CONV_DEG_MIN(target);
       break;
     case 14: // SERIAL_CMD_SET_ANGLE_CONV_DEG_MAX
-      CONVERSIONS_ADC_MAX_DEG[target - 1] = param;
-      Serial.println(COMMAND_COMPLETE);
+      SERIAL_CMD_SET_ANGLE_CONV_DEG_MAX(target, param);
       break;
     case 15: // SERIAL_CMD_GET_ANGLE_CONV_DEG_MAX
-      Serial.println(CONVERSIONS_ADC_MAX_DEG[target - 1]);
+      SERIAL_CMD_GET_ANGLE_CONV_DEG_MAX(target);
       break;
     case 16: // SERIAL_CMD_SET_ANGLE_JOINT_DEG_MIN
-      JOINT_RANGE_MIN_DEG[target - 1] = param;
-      Serial.println(COMMAND_COMPLETE);
+      SERIAL_CMD_SET_ANGLE_JOINT_DEG_MIN(target, param);
       break;
     case 17: // SERIAL_CMD_GET_ANGLE_JOINT_DEG_MIN
-      Serial.println(JOINT_RANGE_MIN_DEG[target - 1]);
+      SERIAL_CMD_GET_ANGLE_JOINT_DEG_MIN(target);
       break;
     case 18: // SERIAL_CMD_SET_ANGLE_JOINT_DEG_MAX
-      JOINT_RANGE_MAX_DEG[target - 1] = param;
-      Serial.println(COMMAND_COMPLETE);
+      SERIAL_CMD_SET_ANGLE_JOINT_DEG_MAX(target, param);
       break;
     case 19: // SERIAL_CMD_GET_ANGLE_JOINT_DEG_MAX
-      Serial.println(JOINT_RANGE_MAX_DEG[target - 1]);
+      SERIAL_CMD_GET_ANGLE_JOINT_DEG_MAX(target);
       break;
     case 20: // SERIAL_CMD_SAVE_SETTINGS
-      Save_Settings();
-      Serial.println(COMMAND_COMPLETE);
+      SERIAL_CMD_SAVE_SETTINGS();
       break;
     case 21: // SERIAL_CMD_LOAD_SETTINGS
-      Load_Settings();
-      Serial.println(COMMAND_COMPLETE);
+      SERIAL_CMD_LOAD_SETTINGS();
       break;
     case 22: // SERIAL_CMD_SET_MOTOR_SPEED
-      Set_Motor_Speed(target, param);
-      Serial.println(COMMAND_COMPLETE);
+      SERIAL_CMD_SET_MOTOR_SPEED(target, param);
       break;
     case 23: // SERIAL_CMD_GET_MOTOR_SPEED
-      Serial.println(MOTOR_SPEEDS[target - 1]);
+      SERIAL_CMD_GET_MOTOR_SPEED(target);
       break;
     case 24: // SERIAL_CMD_HOMING_SEQUENCE
-      if (Homing_Sequence(target)) Serial.println(COMMAND_COMPLETE);
-      else Serial.println(ERROR_HOMING_FAILED);
+      SERIAL_CMD_HOMING_SEQUENCE(target);
       break;
     case 25: // SERIAL_CMD_PID_AUTOTUNE
-      if (param <= 0) { // time value should not be negative or zero
-        Serial.println(ERROR_PARAMETER_BOUNDS);
-        break;
-      }
-      if (PID_Autotune(target, param))
-        Serial.println(COMMAND_COMPLETE);
-      else Serial.println(ERROR_PID_AUTOTUNE_FAILED);
+      SERIAL_CMD_PID_AUTOTUNE(target, param);
       break;
     default: // UNKNOWN COMMAND
       Serial.println(ERROR_UNKNOWN_COMMAND);
