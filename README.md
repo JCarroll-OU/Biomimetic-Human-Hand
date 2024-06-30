@@ -1,4 +1,4 @@
-# Biomimetric Human Hand
+# Biomimetic Human Hand
 A mostly 3D-printable 21-DOF biologically inspired robotic human hand prototype.
 Joints are actuated via 1mm-diameter 304-Stainless-Steel cable driven by motors in the forearm assembly. These cables are fed through 1mm-ID, 2mm-OD PTFE tubing that runs from the forearm to joints. Additionally, these cables will be driven by N20 motors geared down to 300 RPM.
 
