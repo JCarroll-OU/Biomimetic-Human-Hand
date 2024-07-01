@@ -37,7 +37,7 @@ Joints are actuated via 1mm-diameter 304-Stainless-Steel cable driven by motors 
 
 ## Project Highlights:
 - **DC Motor Controller PCB** 
-  - These PCBs implement a PID control algorithm complete with an auto-tuning feature. Each board can support up to 8 motors, so 4 are required to drive the 25 joints present within this design. Each board is designed to operate at 7-12v.
+  - These PCBs implement a PID control algorithm complete with an auto-tuning feature. Each board can support up to 8 motors, so 4 are required to drive the 21 joints present within this design. Each board is designed to operate at 7-12v.
   ![Mk. 4 Schematic](/Designs/Concurrent/DC%20Motor%20Controller/Mk4/Schematic.png)
   - Schematic of Mk. 4 DC Motor Controller PCB. 
   ![Mk. 4 Board Layout](/Designs/Concurrent/DC%20Motor%20Controller/Mk4/Board%20Layout.png)
