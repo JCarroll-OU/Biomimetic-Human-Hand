@@ -2,40 +2,6 @@
 A mostly 3D-printable 21-DOF biologically inspired robotic human hand prototype.
 Joints are actuated via 1mm-diameter 304-Stainless-Steel cable driven by motors in the forearm assembly. These cables are fed through 1mm-ID, 2mm-OD PTFE tubing that runs from the forearm to joints. Additionally, these cables will be driven by N20 motors geared down to 300 RPM.
 
-## Progess Report:
-**March 2024:** Started preliminary research and development. 
-- Formulated general design constraints for the robot.
-- Explored multiple forms of actuation including hydraulic and electric.
-- Opted for electric due to size, simplicity, cost, and reliability.
-
-**April 2024:** Development of DC Motor Controller PCB.
-- Designed, tested, and revised boards, eventually arriving at the third major milestone, Mk 3. 
-- Ordered prototypes via PCBWay.
-- Wrote the AVR code necessary to implement motor control, SPI, and ADC.
-
-**May 2024:** Controls R&D
-- Received and assembled prototype boards.
-- Unable to read device signature.
-- Continuity check: OK
-- Signal integrity: Unable to access oscilliscope, engineering lab is temporarly closed.
-- Hiatus, I feel dumb.
-
-**June 2024:** Continued controls R&D
-- Opted to keep things simple by using Arduino based controllers and serial communication.
-- Ordered Mk. 4 DC Motor Controller PCB prototypes with 14-day lead-time. 
-- Finalized PID controller code for Arduino Nanos. 
-
-**June 25<sup>th</sup>, 2024:** Created GitHub repository and made initial commit.
-- Setup file structure such that concurrent and deprecated parts of the project are in separate folders.
-- Separated project components into software and hardware categories.
-- Changed the shape of the 'metacarpus' to allow for the thumb to flex towards the palm of the hand. 
-
-**Recent changes:** Started designed forearm assembly, which houses the motors and controller PCBs. 
-- Integrated MS90S servo into wrist assembly. 
-- Fixed clearance issues that resulted in low success rate for FDM prints.
-- More renders and documentation. 
-
-## Project Highlights:
 - **DC Motor Controller PCB** 
   - These PCBs implement a PID control algorithm complete with an auto-tuning feature. Each board can support up to 8 motors, so 4 are required to drive the 21 motors present within this design. Each board is designed to operate at 7-12v.
   ![Mk. 4 Schematic](/Designs/Concurrent/DC%20Motor%20Controller/Mk4/Schematic.png)
